@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nuance Scorecard — Nutgraf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:      #1b2d6b;
+    --navy-deep: #111e4a;
+    --navy-mid:  #243580;
+    --ice:       #d6e4f7;
+    --ice-light: #eaf2fc;
+    --white:     #ffffff;
+    --off-white: #f4f7fc;
+    --rule:      #c2d3ec;
+    --muted:     #6278a8;
+    --ink:       #1a1e2e;
+
+    --score-1:   #c0392b;
+    --score-2:   #d68910;
+    --score-3:   #1e8449;
+
+    --verdict-low:  #c0392b;
+    --verdict-mid:  #d68910;
+    --verdict-high: #1e8449;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--off-white);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ── STICKY PROGRESS ──────────────────────────────────────────── */
+  .progress-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 4px;
+    background: var(--ice);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--navy-mid), #4a6fd4);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* ── MASTHEAD ─────────────────────────────────────────────────── */
+  .masthead {
+    background: var(--navy-deep);
+    padding: 0 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    border-bottom: 3px solid var(--navy-mid);
+  }
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-img {
+    height: 38px;
+    width: 38px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+  .logo-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255,255,255,0.2);
+  }
+  .logo-sub {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ice);
+    opacity: 0.7;
+  }
+  .masthead-right {
+    font-size: 11px;
+    color: var(--ice);
+    opacity: 0.5;
+    letter-spacing: 0.04em;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* ── HERO ─────────────────────────────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    padding: 56px 52px 52px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 52px;
+    align-items: end;
+  }
+  .hero-kicker {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ice);
+    opacity: 0.65;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(34px, 4.5vw, 54px);
+    font-weight: 900;
+    line-height: 1.07;
+    letter-spacing: -1px;
+    color: var(--white);
+    margin-bottom: 22px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--ice);
+    opacity: 0.85;
+  }
+  .hero-sub {
+    font-size: 14px;
+    line-height: 1.72;
+    color: var(--ice);
+    opacity: 0.65;
+    max-width: 500px;
+  }
+
+  /* ── LIVE SCORE BOX ───────────────────────────────────────────── */
+  .score-box {
+    background: var(--navy-deep);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 28px 30px;
+    align-self: end;
+  }
+  .score-box-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ice);
+    opacity: 0.45;
+    margin-bottom: 10px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 68px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: var(--white);
+    transition: color 0.3s;
+  }
+  .score-denom {
+    font-size: 22px;
+    opacity: 0.3;
+    font-weight: 400;
+  }
+  .score-verdict {
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--ice);
+    opacity: 0.4;
+    transition: all 0.3s;
+    min-height: 14px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .verdict-active-low  { color: #e05252 !important; opacity: 1 !important; }
+  .verdict-active-mid  { color: #e8b84a !important; opacity: 1 !important; }
+  .verdict-active-high { color: #4caf82 !important; opacity: 1 !important; }
+
+  /* ── SCALE KEY ────────────────────────────────────────────────── */
+  .scale-key {
+    background: var(--ice-light);
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 52px;
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+  .scale-key-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .key-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .key-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ── CONTENT WRAPPER ──────────────────────────────────────────── */
+  .content {
+    padding: 0 52px;
+    max-width: 960px;
+  }
+
+  /* ── SECTION ──────────────────────────────────────────────────── */
+  .section {
+    margin-top: 0;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 34px 0 16px;
+    border-bottom: 2px solid var(--navy);
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  .section-pill {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--ice-light);
+    border: 1px solid var(--rule);
+    padding: 3px 11px;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .section-desc {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    flex-shrink: 0;
+    max-width: 190px;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ── CRITERION ROW ────────────────────────────────────────────── */
+  .criterion {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 28px;
+    align-items: start;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+    transition: background 0.1s;
+  }
+  .criterion:last-child { border-bottom: none; }
+  .criterion-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 5px;
+    line-height: 1.45;
+  }
+  .criterion-hint {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.58;
+    font-style: italic;
+  }
+
+  /* ── SCORE BUTTONS ────────────────────────────────────────────── */
+  .score-btns {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .score-btn {
+    width: 46px;
+    height: 48px;
+    border: 1.5px solid var(--rule);
+    background: var(--white);
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    line-height: 1;
+    gap: 2px;
+  }
+  .btn-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+  .score-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(27,45,107,0.1);
+  }
+  .score-btn.active-1 { background: var(--score-1); border-color: var(--score-1); color: white; }
+  .score-btn.active-1 .btn-sub { color: rgba(255,255,255,0.65); opacity: 1; }
+  .score-btn.active-2 { background: var(--score-2); border-color: var(--score-2); color: white; }
+  .score-btn.active-2 .btn-sub { color: rgba(255,255,255,0.65); opacity: 1; }
+  .score-btn.active-3 { background: var(--score-3); border-color: var(--score-3); color: white; }
+  .score-btn.active-3 .btn-sub { color: rgba(255,255,255,0.65); opacity: 1; }
+
+  /* ── RESULTS ──────────────────────────────────────────────────── */
+  .results {
+    margin-top: 48px;
+    background: var(--navy-deep);
+    color: var(--white);
+    padding: 44px 44px;
+    display: none;
+  }
+  .results.visible { display: block; }
+
+  .results-top {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 32px;
+  }
+  .r-block-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 8px;
+  }
+  .r-block-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .r-block-sub {
+    font-size: 11px;
+    opacity: 0.4;
+    margin-top: 5px;
+  }
+
+  .verdict-section {}
+  .verdict-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 12px;
+  }
+  .verdict-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 14px;
+    color: var(--ice);
+  }
+  .verdict-copy {
+    font-size: 14px;
+    line-height: 1.75;
+    opacity: 0.7;
+    max-width: 620px;
+  }
+
+  .weak-block {
+    padding-top: 28px;
+    margin-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: none;
+  }
+  .weak-block.visible { display: block; }
+  .weak-block-label {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 14px;
+  }
+  .weak-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .weak-item {
+    font-size: 13px;
+    opacity: 0.75;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .weak-item::before { content: "→"; opacity: 0.35; flex-shrink: 0; }
+
+  /* ── ACTION BUTTONS ───────────────────────────────────────────── */
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--ice);
+    color: var(--navy-deep);
+    border: none;
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ice);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 12px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.6); }
+
+  /* ── FOOTER ───────────────────────────────────────────────────── */
+  .footer {
+    margin-top: 56px;
+    padding: 24px 52px;
+    border-top: 2px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-logo-img {
+    height: 26px;
+    width: 26px;
+    object-fit: contain;
+    border-radius: 4px;
+    opacity: 0.7;
+  }
+  .footer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .footer-note {
+    font-size: 11px;
+    color: var(--muted);
+    opacity: 0.7;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    .masthead, .hero, .content, .scale-key, .footer {
+      padding-left: 20px; padding-right: 20px;
+    }
+    .hero { grid-template-columns: 1fr; }
+    .score-box { display: none; }
+    .results-top { grid-template-columns: 1fr 1fr; }
+    .section-desc { display: none; }
+    .results { padding: 28px 20px; }
+  }
+
+  @media print {
+    .progress-wrap { display: none; }
+    .result-actions { display: none; }
+    body { background: white; }
+    .score-btn { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .results { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-wrap">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<header class="masthead">
+  <div class="logo-wrap">
+    <img class="logo-img" src="assets/nutgraf-logo.png" alt="Nutgraf">
+    <span class="logo-text">Nutgraf</span>
+    <div class="logo-divider"></div>
+    <span class="logo-sub">B2B Insights · Audit Tool</span>
+  </div>
+  <div class="masthead-right">nutgraf.press<br>ritoban@nutgraf.press</div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="hero-kicker">The Nuance Scorecard</div>
+    <h1 class="hero-title">Does your content<br><em>earn</em> its argument?</h1>
+    <p class="hero-sub">Score each criterion 1–3. A total of 30 means your content is genuinely complex, specific, and honest about its limits. Below 15 means it's telling a clean story that doesn't survive contact with a skeptical buyer.</p>
+  </div>
+  <div class="score-box">
+    <div class="score-box-label">Current Score</div>
+    <div class="score-num" id="scoreLive">—<span class="score-denom"></span></div>
+    <div class="score-verdict" id="scoreVerdict">Score your content below</div>
+  </div>
+</section>
+
+<div class="scale-key">
+  <span class="scale-key-label">Scale:</span>
+  <div class="key-item"><div class="key-dot" style="background:var(--score-1)"></div>1 = Oversimplified or absent</div>
+  <div class="key-item"><div class="key-dot" style="background:var(--score-2)"></div>2 = Present but incomplete</div>
+  <div class="key-item"><div class="key-dot" style="background:var(--score-3)"></div>3 = Clear, specific, and earned</div>
+</div>
+
+<div class="content">
+  <main id="scorecard"></main>
+
+  <div class="results" id="resultsPanel">
+    <div class="results-top">
+      <div>
+        <div class="r-block-label">Total Score</div>
+        <div class="r-block-val" id="rTotal">—</div>
+        <div class="r-block-sub">out of 30</div>
+      </div>
+      <div>
+        <div class="r-block-label">Nuance Index</div>
+        <div class="r-block-val" id="rPct">—</div>
+        <div class="r-block-sub">percentage</div>
+      </div>
+      <div>
+        <div class="r-block-label">Criteria Scored</div>
+        <div class="r-block-val" id="rCount">—</div>
+        <div class="r-block-sub">of 10 completed</div>
+      </div>
+    </div>
+    <div class="verdict-section">
+      <div class="verdict-label">Verdict</div>
+      <div class="verdict-title" id="rTitle">—</div>
+      <div class="verdict-copy" id="rCopy">—</div>
+    </div>
+    <div class="weak-block" id="weakBlock">
+      <div class="weak-block-label">Lowest-scoring areas to revisit</div>
+      <ul class="weak-list" id="weakList"></ul>
+    </div>
+    <div class="result-actions">
+      <button class="btn-primary" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn-ghost" onclick="resetAll()">Start Over</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-brand">
+    <img class="footer-logo-img" src="assets/nutgraf-logo.png" alt="Nutgraf">
+    <span class="footer-name">Nutgraf by Ritoban Mukherjee</span>
+  </div>
+  <div class="footer-note">
+    Based on the CTN framework by Amanda Ripley / Solutions Journalism Network<br>
+    Adapted for B2B content · <a href="https://www.nutgraf.press" style="color:inherit">nutgraf.press</a>
+  </div>
+</footer>
+
+<script>
+const SECTIONS = [
+  {
+    num: "I",
+    title: "Claim & Context",
+    desc: "Is the argument honest about what it can and can't prove?",
+    criteria: [
+      {
+        id: "c1",
+        label: "The central claim includes its conditions.",
+        hint: "Does the piece specify when, for whom, and under what circumstances the argument holds? Or does it imply a universal verdict?"
+      },
+      {
+        id: "c2",
+        label: "Generalization has been replaced with simplification.",
+        hint: "Has the author stripped only the non-essential details, retaining the context a reader needs to act? Or have important caveats been dropped for clarity?"
+      },
+      {
+        id: "c3",
+        label: "The piece engages with counterevidence.",
+        hint: "Are there data points or scenarios that complicate the argument? Are they included rather than omitted?"
+      }
+    ]
+  },
+  {
+    num: "II",
+    title: "Audience Honesty",
+    desc: "Does it speak to the full buyer, not just the easiest target?",
+    criteria: [
+      {
+        id: "c4",
+        label: "The piece acknowledges who it isn't for.",
+        hint: "Does the content signal, at any point, the buyer profiles or contexts where this argument or solution doesn't apply?"
+      },
+      {
+        id: "c5",
+        label: "More than one stakeholder perspective is represented.",
+        hint: "B2B buying groups average eleven people. Does the content address more than one function, role, or decision-making lens?"
+      },
+      {
+        id: "c6",
+        label: "The piece avoids flattering the reader's existing beliefs.",
+        hint: "Does the content challenge a dominant assumption the audience likely holds, or does it simply confirm what they already think?"
+      }
+    ]
+  },
+  {
+    num: "III",
+    title: "Sourcing & Specificity",
+    desc: "Does evidence earn the argument or decorate it?",
+    criteria: [
+      {
+        id: "c7",
+        label: "Claims are attributed to named, specific sources.",
+        hint: "Are statistics and quotes tied to named studies, named people, or named publications? Or are they anonymous and unverifiable?"
+      },
+      {
+        id: "c8",
+        label: "Examples are concrete, not archetypal.",
+        hint: "Are illustrations drawn from real, named companies or documented situations? Or from vague composites like 'a B2B SaaS brand' or 'one founder we spoke to'?"
+      }
+    ]
+  },
+  {
+    num: "IV",
+    title: "Ethical Integrity",
+    desc: "Does the piece handle contested terrain honestly?",
+    criteria: [
+      {
+        id: "c9",
+        label: "Contested topics are not reduced to false balance.",
+        hint: "If the piece covers an ethically or politically charged topic (DEI, AI and jobs, etc.), does it resist the both-sides framing that implies all positions are equally defensible?"
+      },
+      {
+        id: "c10",
+        label: "The piece does not oversell the category or the solution.",
+        hint: "Does the content acknowledge genuine limitations, tradeoffs, or implementation realities? Or is the pitch clean and frictionless all the way through?"
+      }
+    ]
+  }
+];
+
+const VERDICTS = [
+  {
+    max: 14,
+    title: "The Clean Pitch Problem",
+    copy: "This content is optimized for persuasion, not accuracy. It likely makes sweeping claims, speaks to one type of buyer, and omits the conditions under which its argument breaks down. Informed readers will disengage. Wrong-fit buyers will convert. Revisit the criteria scored at 1 and ask: what details have been dropped to make this argument cleaner than it actually is?"
+  },
+  {
+    max: 21,
+    title: "Conditionally Honest",
+    copy: "There's nuance here, but it's inconsistently applied. Some claims are well-contextualized; others make broader promises than the evidence supports. The piece is better than most B2B content — which isn't a high bar. Look at where it scored 1 or 2. A few specific additions can move this into genuine complexity without sacrificing clarity or conviction."
+  },
+  {
+    max: 30,
+    title: "Genuinely Complex",
+    copy: "This content earns its argument. It acknowledges conditions, engages counterevidence, speaks to more than one stakeholder, and handles contested terrain honestly. The readers you want to attract will recognize it. The ones who would misread your pitch as a guarantee won't make it far — which is exactly the point."
+  }
+];
+
+const scores = {};
+
+function buildScorecard() {
+  const container = document.getElementById('scorecard');
+  SECTIONS.forEach(sec => {
+    const secEl = document.createElement('div');
+    secEl.className = 'section';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.innerHTML = `
+      <span class="section-num">${sec.num}</span>
+      <span class="section-title">${sec.title}</span>
+      <span class="section-pill" id="pill-${sec.num}">0 / ${sec.criteria.length * 3}</span>
+      <span class="section-desc">${sec.desc}</span>
+    `;
+    secEl.appendChild(hdr);
+
+    sec.criteria.forEach(crit => {
+      const row = document.createElement('div');
+      row.className = 'criterion';
+      row.innerHTML = `
+        <div>
+          <div class="criterion-label">${crit.label}</div>
+          <div class="criterion-hint">${crit.hint}</div>
+        </div>
+        <div class="score-btns">
+          ${[1,2,3].map(v => `
+            <button class="score-btn" data-id="${crit.id}" data-val="${v}" onclick="setScore('${crit.id}',${v},this)">
+              ${v}<span class="btn-sub">${['Weak','Partial','Strong'][v-1]}</span>
+            </button>`).join('')}
+        </div>
+      `;
+      secEl.appendChild(row);
+    });
+
+    container.appendChild(secEl);
+  });
+}
+
+function setScore(id, val, btn) {
+  scores[id] = val;
+  btn.parentElement.querySelectorAll('.score-btn').forEach(b => {
+    b.classList.remove('active-1','active-2','active-3');
+  });
+  btn.classList.add(`active-${val}`);
+  updateLive();
+  updatePills();
+  if (Object.keys(scores).length === 10) showResults();
+}
+
+function updateLive() {
+  const total = Object.values(scores).reduce((a,b) => a+b, 0);
+  const count = Object.keys(scores).length;
+  const liveEl = document.getElementById('scoreLive');
+  const verdEl = document.getElementById('scoreVerdict');
+  const fill   = document.getElementById('progressFill');
+
+  if (!count) {
+    liveEl.innerHTML = '—';
+    verdEl.textContent = 'Score your content below';
+    verdEl.className = 'score-verdict';
+    fill.style.width = '0%';
+    return;
+  }
+
+  liveEl.innerHTML = `${total}<span class="score-denom"> /30</span>`;
+  fill.style.width = `${Math.round((total/30)*100)}%`;
+
+  if (total <= 14) {
+    verdEl.textContent = 'Oversimplified';
+    verdEl.className = 'score-verdict verdict-active-low';
+  } else if (total <= 21) {
+    verdEl.textContent = 'Conditionally Honest';
+    verdEl.className = 'score-verdict verdict-active-mid';
+  } else {
+    verdEl.textContent = 'Genuinely Complex';
+    verdEl.className = 'score-verdict verdict-active-high';
+  }
+}
+
+function updatePills() {
+  SECTIONS.forEach(sec => {
+    const pill = document.getElementById(`pill-${sec.num}`);
+    const tot  = sec.criteria.reduce((a,c) => a + (scores[c.id]||0), 0);
+    const max  = sec.criteria.length * 3;
+    pill.textContent = `${tot} / ${max}`;
+    const r = tot / max;
+    pill.style.background = r >= 0.8 ? 'rgba(30,132,73,0.12)' :
+                             r >= 0.5 ? 'rgba(214,137,16,0.12)' :
+                                        'rgba(192,57,43,0.1)';
+    pill.style.borderColor = r >= 0.8 ? 'rgba(30,132,73,0.3)' :
+                              r >= 0.5 ? 'rgba(214,137,16,0.3)' :
+                                         'rgba(192,57,43,0.25)';
+  });
+}
+
+function showResults() {
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const count = Object.keys(scores).length;
+  const pct   = Math.round((total/30)*100);
+
+  document.getElementById('rTotal').textContent = total;
+  document.getElementById('rPct').textContent   = `${pct}%`;
+  document.getElementById('rCount').textContent  = count;
+
+  const verdict = VERDICTS.find(v => total <= v.max) || VERDICTS[VERDICTS.length-1];
+  document.getElementById('rTitle').textContent = verdict.title;
+  document.getElementById('rCopy').textContent  = verdict.copy;
+
+  // Weak spots (scored 1)
+  const allC = SECTIONS.flatMap(s => s.criteria.map(c => ({
+    ...c, score: scores[c.id]||0, section: s.title
+  })));
+  const weak = allC.filter(c => c.score === 1);
+  if (weak.length) {
+    const wb = document.getElementById('weakBlock');
+    wb.classList.add('visible');
+    const list = document.getElementById('weakList');
+    list.innerHTML = '';
+    weak.slice(0,5).forEach(c => {
+      const li = document.createElement('li');
+      li.className = 'weak-item';
+      li.textContent = `${c.section}: ${c.label}`;
+      list.appendChild(li);
+    });
+  }
+
+  const panel = document.getElementById('resultsPanel');
+  panel.classList.add('visible');
+  setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'start' }), 120);
+}
+
+function resetAll() {
+  Object.keys(scores).forEach(k => delete scores[k]);
+  document.querySelectorAll('.score-btn').forEach(b => {
+    b.classList.remove('active-1','active-2','active-3');
+  });
+  document.getElementById('resultsPanel').classList.remove('visible');
+  document.getElementById('weakBlock').classList.remove('visible');
+  document.getElementById('weakList').innerHTML = '';
+  updateLive();
+  SECTIONS.forEach(sec => {
+    const pill = document.getElementById(`pill-${sec.num}`);
+    pill.textContent = `0 / ${sec.criteria.length * 3}`;
+    pill.style.background = '';
+    pill.style.borderColor = '';
+  });
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+buildScorecard();
+</script>
+</body>
+</html>
