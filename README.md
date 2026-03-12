@@ -55,13 +55,6 @@ No build step. No dependencies. No npm. Just HTML, CSS, and vanilla JS.
 1. Drop the `nutgraf-scorecard/` folder into your existing repo
 2. Access it at `https://yourusername.github.io/your-repo/nutgraf-scorecard/`
 
-### Custom domain (optional)
-
-To serve from `nutgraf.press/scorecard`:
-1. In your repo root, add a `CNAME` file containing your domain: `nutgraf.press`
-2. In your DNS settings, add a CNAME record pointing to `yourusername.github.io`
-3. Enable HTTPS in GitHub Pages settings
-
 ---
 
 ## Methodology
